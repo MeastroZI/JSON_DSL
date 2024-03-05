@@ -7,18 +7,24 @@ const transformRule = [
 
 {
     path: '*',
-    conditions: [{ "isKey": "items", "hasSibling": ["type", "array"] }],
-    operations: {
-        "editKey": "prefixItems"
-    }
-} , 
-{
-    path : '$schema' ,
-  
-    operations : {
-        "updateValue" : "https://json-schema.org/draft/2020-12/schema"
-    }
-}
+    // conditions: [{ "isKey": "items", "hasSibling": ["type", "array"] }],
+    // operations: {
+    //     "editKey": "prefixItems"
+    // },
+    condOperMapper : [
+        {conditions : [{"isKey": "items", "hasSibling": ["type", "array"] }]  , operations : {"editKey": "prefixItems"}},
+        {conditions : [{"isKey" : "$schema"}] , operations : { "updateValue" : "https://json-schema.org/draft/2020-12/schema"}}
+
+    
+    ]
+} 
+// {
+//     path : '$schema' ,
+    
+//     operations : {
+//         "updateValue" : "https://json-schema.org/draft/2020-12/schema"
+//     }
+// }
 ]
 
 
