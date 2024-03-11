@@ -1,8 +1,8 @@
-let count = 0
-function some (){
-    count = count + 1 
-    console.log(count)
-    some ()
-    return
-}
-some ()
+var url = require('url');
+
+
+const baseUri = "https://example.com/schema/customer"
+
+const absoluteUri = url.resolve(baseUri ,baseUri)
+
+console.log(absoluteUri)
