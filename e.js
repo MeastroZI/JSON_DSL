@@ -1,6 +1,6 @@
 
 
-const {Convert} = require("../lib/DSL")
+const {Convert} = require("./lib/DSL")
 
 
 const transformRule = [

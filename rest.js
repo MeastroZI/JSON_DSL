@@ -1,8 +1,3 @@
-var url = require('url');
+const arr ="https://example.com/schema/customer#/hhhh"
 
-
-const baseUri = "https://example.com/schema/customer"
-
-const absoluteUri = url.resolve(baseUri ,baseUri)
-
-console.log(absoluteUri)
+console.log(new URL(arr))
