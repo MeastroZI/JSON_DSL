@@ -36,7 +36,8 @@ const transformRule = [
                     conditions: [{
                       "isEqual": { value1: "additionalItems", value2: { getStorage: "_$value_" } },
                       "hasSibling": { key: "type", value: "array", from: { getStorage: "prevReference" } }
-                    }]
+                    }],
+                    getters: { getConcatinate: [{ getStorage: "path" }, '/', "items"] }
                   },
                   //******************Default conditions to append the value as it is  */
                   { getters: { getConcatinate: [{ getStorage: "path" }, '/', { getStorage: "_$value_" }] } }
@@ -96,7 +97,9 @@ const transformRule = [
 
 
 
-const jasonobj = [{
+const jasonobjs = [{
+  //********************Bundled Schema************************ */
+
   "$schema": "https://json-schema.org/draft/2019-12",
   "$id": "https://example.com/schema/customer",
 
@@ -104,7 +107,7 @@ const jasonobj = [{
   "properties": {
     "name": { "type": "string" },
     "phone": { "$ref": "/schema/common#/$defs/phone" },
-    "address": { "$ref": "/schema/address#/properties/city/items/0/something/items" },
+    "address": { "$ref": "/schema/address#/properties/city/items/0/something/items/items/items" },
     "address2": { "$ref": "/schema/address#/properties/city/additionalItems" }
   },
 
@@ -152,6 +155,8 @@ const jasonobj = [{
     }
   }
 },
+
+/***************************normal Schema*********************************** */
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
   "$id": "https://example.com/tree",
@@ -178,7 +183,7 @@ let count = 1
 // console.log(JSON.stringify(result , null ,2) )
 
 
-for (const elm of jasonobj) {
+for (const elm of jasonobjs) {
   const instance = Convert(transformRule, elm)
   instance.analyseSchemaIds()
   const result = instance.applytransformations()
