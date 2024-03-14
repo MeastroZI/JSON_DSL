@@ -77,6 +77,24 @@ const transformRule = [
         }
 
       },
+      /**********************************Items ----> prefixItems ***************************/
+
+      {
+        conditions : 
+        [{
+          "hasChild" : {childName : "items"} , 
+          "hasSibling" : {key : "type" , value : "array" , from : {getReference : {path : "#.../"}}}
+        }],
+
+        operations : {
+          "editChildKey" : {key : "items" , newKey : "prefixItems"}
+        }
+
+      },
+
+
+
+
       //*****************************$schema Transformation *********************************/
       {
         conditions: [{ "isKey": { key: "$schema" } }],
@@ -97,7 +115,8 @@ const transformRule = [
 
 
 
-const jasonobjs = [{
+const jasonobjs = [
+  {
   //********************Bundled Schema************************ */
 
   "$schema": "https://json-schema.org/draft/2019-12",
@@ -171,7 +190,39 @@ const jasonobjs = [{
       }
     }
   }
+} ,
+
+/*********************************$anchore Schema********************************** */
+{
+  "$id": "https://example.com/ecommerce.schema.json",
+  "$schema": "https://json-schema.org/draft/2019-12/schema",
+  "$defs": {
+    "product": {
+      "$anchor": "ProductSchema",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "price": { "type": "number", "minimum": 0 },
+        "something" : {"type" : "array" , "items" : 
+        [
+          {"$ref" : "#OrderSchema/properties/items"} ,
+          {"$ref" : "#ProductSchema/properties/something/items"}]}
+      }
+    },
+    "order": {
+      "$anchor": "OrderSchema",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#ProductSchema" }
+        }
+      }
+    }
+  }
 }
+
 ]
 
 
@@ -185,7 +236,7 @@ let count = 1
 
 for (const elm of jasonobjs) {
   const instance = Convert(transformRule, elm)
-  instance.analyseSchemaIds()
+  const analyseResult =instance.analyseSchemaIds()
   const result = instance.applytransformations()
   console.log(`**********************************************___${count} Schema___*******************************************\n\n\\n`)
 
