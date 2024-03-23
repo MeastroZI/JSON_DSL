@@ -1,131 +1,86 @@
 const { Convert } = require("../lib/DSL")
 
-// this is the DSL rule to solve the ref problem of the json schema of the draft 2020 12  , the main thing which Solve this problem is the getRefernce logic in the DSL in Getters Object
-
 
 
 const transformRule = [
     {
-      path: "*",
-      condOperMapper: [
-        //*****************************$ref Transformation********************************** */
-        {
-          conditions: [
-            { "isKey": { key: "$ref" }, "valuePattern": ".*\\bitems\\b.*" },
-            { "isKey": { key: "$ref" }, "valuePattern": ".*\\badditionalItems\\b.*" }
-          ],
-          operations: {
-            "valueIterator": {
-              targetValue: { getFragmentUri: null },
-              type: "string", splitBy: "/",
-              defineStorage: {
-                "path": {
-                  
-                  current: { "getConcatinate": [{"getUriWithoutFragment" :{ uri : {"getValue" : null}}} , '#'] },
-                  updater: [
-                 
-                    // **************items ---- > prefixitems
-                    {
-                      conditions: [
-                        {
-                          "isEqual": { value1: "items", value2: { getStorage: "_$value_" } },
-                          "hasProperty": { key: "type", value: "array", from: { getStorage: "prevReference" } }
-                        }],
-                      getters: { getConcatinate: [{ getStorage: "path" }, '/', "prefixItems"] }
-                    },
-                    
-                    // ***************additionalItems ---- > items
-                    {
-                      conditions: [{
-                        "isEqual": { value1: "additionalItems", value2: { getStorage: "_$value_" } },
-                        "hasProperty": { key: "type", value: "array", from: { getStorage: "prevReference" } }
-                      }],
-                      getters: { getConcatinate: [{ getStorage: "path" }, '/', "items"] }
-                    },
-                    //******************Default conditions to append the value as it is  */
-                    { getters: { getConcatinate: [{ getStorage: "path" }, '/', { getStorage: "_$value_" }] } }
-  
-                  ]
-                },
-                "prevReference": {
-                  current: { getReference: { path: { getRootUri: { uri: { getValue: null } } } } },
-                  updater: [
-                    { conditions: [{ "isEqual": { value1: "#", value2: { getStorage: "_$value_" } } }] },
-                    { getters: { getReference: { path: { getConcatinate: ['#/', { getStorage: "_$value_" }] }, from: { getStorage: "prevReference" } } } }
-                  ]
+        path: "*",
+        condOperMapper: [
+            //*****************************$ref Transformation********************************** */
+            {
+                conditions: [
+                    { "isKey": { key: "$ref" }, "valuePattern": ".*\\bitems\\b.*" },
+                    { "isKey": { key: "$ref" }, "valuePattern": ".*\\badditionalItems\\b.*" }
+                ],
+                operations: {
+                    "valueIterator": {
+                        targetValue: { getFragmentUri: null },
+                        type: "string", splitBy: "/",
+                        defineStorage: {
+                            "path": {
+                                current: { "getConcatinate": [{ "getUriWithoutFragment": { uri: { "getValue": null } } }, '#'] },
+                                updater: [
+                                    // items ----------------->  prefixItems
+                                    { conditions: [
+                                            { 
+                                                isEqual: { value1: "items", value2: { getStorage: "_$value_" } } ,
+                                                not: {
+                                                    condiArr: [
+                                                        {
+                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "properties" },
+                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "$defs" }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                           
+                                        ],
+                                        getters: {
+                                            getConcatinate: [{ getStorage: "path" }, "/prefixItems"]
+                                        }
+                                    },
+                                    // aditionalitems -----------------> items
+                                    {
+                                        conditions: [
+                                            {
+                                                 isEqual: { value1: "additionalItems", value2: { getStorage: "_$value_" } },
+                                                 not: {
+                                                    condiArr: [
+                                                        {
+                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "properties" },
+                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "$defs" }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                           
+                                        ],
+                                        getters: {
+                                            getConcatinate: [{ getStorage: "path" }, "/items"]
+                                        }
+                                    },
+                                    //default 
+                                    {
+                                        getters: { getConcatinate: [{ getStorage: "path" }, "/", { getStorage: "_$value_" }] }
+                                    }
+                                ]
+                            },
+
+                            "prevKey": {
+                                updater: [{ getters: { getStorage: "_$value_" } }]
+                            }
+                        },
+                        // final operation of updating the $ref 
+                        operations : {
+                            "updateValue" : { value : {getStorage : "path"}}
+                        }
+                    }
                 }
-              },
-  
-              operations: {
-                "updateValue": { value: { getStorage: "path" } }
-              }
             }
-          }
-        },
-        //*****************************$recursiveAnchor Tramsformation********************** */
-        {
-          conditions: [{ "hasChild": { childName: "$recursiveAnchor" } }],
-          operations: {
-            "updateValue": { key: "$recursiveAnchor", parent: { getReference: { path: "#.../" } }, value: "node" },
-            "editChildKey": { key: "$recursiveAnchor", newKey: "$dynamicAnchor" }
-          }
-  
-        },
-        /*********************************$recursiveRef Transformation********************* */
-        {
-          conditions: [{ "hasChild": { childName: "$recursiveRef" } }],
-          operations: {
-            "updateValue": { key: "$recursiveRef", parent: { getReference: { path: "#.../" } }, value: "#node" },
-            "editChildKey": { key: "$recursiveRef", newKey: "$dynamicRef" }
-          }
-  
-        },
-        /**********************************Items ----> prefixItems ***************************/
-  
-        {
-          conditions : 
-          [{
-            "hasChild" : {childName : "items"} , 
-            "hasProperty" : {key : "type" , value : "array" , from : {getReference : {path : "#.../"}}}
-          }],
-  
-          operations : {
-            "editChildKey" : {key : "items" , newKey : "prefixItems"}
-          }
-  
-        },
+        ]
 
-        /*******************additionalItems ---> items *********************/
-        {
-          conditions : 
-          [{
-            "hasChild" : {childName : "additionalItems"} , 
-            "hasProperty" : {key : "type" , value : "array" , from : {getReference : {path : "#.../"}}}
-          }],
-  
-          operations : {
-            "editChildKey" : {key : "additionalItems" , newKey : "items"}
-          }
-  
-        },
-  
-  
-  
-  
-        //*****************************$schema Transformation *********************************/
-        {
-          conditions: [{ "isKey": { key: "$schema" } }],
-          operations: { "updateValue": { value: "https://json-schema.org/draft/2020-12/schema" } }
-  
-        }
-      ]
-  
     }
-  ]
-
-
-
-
+]
 
 // this examples are taken from teh JSON schema examples and change littlbit for testing if any validation error is found then ignore please
 const refJsonTest = [
@@ -264,7 +219,7 @@ const refJsonTest = [
         "$recursiveAnchor": true,
         "type": "object",
         "properties": {
-            "items" : {"type" : "string"},
+            "items": { "type": "string" },
             "data": true,
             "children": {
                 "type": "array",
@@ -315,12 +270,12 @@ const refJsonTest = [
 
 let count = 1
 console.log("\n\n\n\n")
-for (const elm of refJsonTest){
-    const instance = Convert(transformRule , elm)
+for (const elm of refJsonTest) {
+    const instance = Convert(transformRule, elm)
     const analyseResult = instance.analyseSchemaIds()
     const result = instance.applytransformations()
     console.log(`**************************************Schema ${count}********************************************`)
-    console.log(JSON.stringify(result , null ,3))
-    count = count+1
+    console.log(JSON.stringify(result, null, 3))
+    count = count + 1
     console.log("\n\n\n\n")
 }
