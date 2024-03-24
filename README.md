@@ -56,65 +56,91 @@ this is the one of example of the rule for DSL , in this <br>
 Now let see the one of the rule which have littlbit complex syntex compare to others 
 
 ```js
-const transformRule = [
-    {
-      path: "*",
-      condOperMapper: [
-        //*****************************$ref Transformation********************************** */
-        {
-          conditions: [
-            { "isKey": { key: "$ref" }, "valuePattern": ".*\\bitems\\b.*" },
-            { "isKey": { key: "$ref" }, "valuePattern": ".*\\badditionalItems\\b.*" }
-          ],
-          operations: {
-            "valueIterator": {
-              targetValue: { getFragmentUri: null },
-              type: "string", splitBy: "/",
-              defineStorage: {
-                "path": {
-                  
-                  current: { "getConcatinate": [{"getUriWithoutFragment" :{ uri : {"getValue" : null}}} , '#'] },
-                  updater: [
-                 
-                    // **************items ---- > prefixitems
-                    {
-                      conditions: [
-                        {
-                          "isEqual": { value1: "items", value2: { getStorage: "_$value_" } },
-                          "hasSibling": { key: "type", value: "array", from: { getStorage: "prevReference" } }
-                        }],
-                      getters: { getConcatinate: [{ getStorage: "path" }, '/', "prefixItems"] }
-                    },
-                    // ***************additionalItems ---- > items
-                    {
-                      conditions: [{
-                        "isEqual": { value1: "additionalItems", value2: { getStorage: "_$value_" } },
-                        "hasSibling": { key: "type", value: "array", from: { getStorage: "prevReference" } }
-                      }],
-                      getters: { getConcatinate: [{ getStorage: "path" }, '/', "items"] }
-                    },
-                    //******************Default conditions to append the value as it is  */
-                    { getters: { getConcatinate: [{ getStorage: "path" }, '/', { getStorage: "_$value_" }] } }
-  
-                  ]
-                },
-                "prevReference": {
-                  current: { getReference: { path: { getRootUri: { uri: { getValue: null } } } } },
-                  updater: [
-                    { conditions: [{ "isEqual": { value1: "#", value2: { getStorage: "_$value_" } } }] },
-                    { getters: { getReference: { path: { getConcatinate: ['#/', { getStorage: "_$value_" }] }, from: { getStorage: "prevReference" } } } }
-                  ]
+const condOperMapper = [{
+   {
+                conditions: [
+                    { "isKey": { key: "$ref" }, "valuePattern": ".*\\bitems\\b.*" },
+                    { "isKey": { key: "$ref" }, "valuePattern": ".*\\badditionalItems\\b.*" }
+                ],
+                operations: {
+                    "valueIterator": {
+                        targetValue: { getFragmentUri: null },
+                        type: "string", splitBy: "/",
+                        defineStorage: {
+                            "path": {
+
+                                current: { "getConcatinate": [{ "getUriWithoutFragment": { uri: { "getValue": null } } }, '#'] },
+                                updater: [
+                                    // items -------------------------> prefixItems
+                                    {
+                                        conditions: [
+                                            {
+                                                isEqual: { value1: "items", value2: { getStorage: "_$value_" } },
+                                                not: {
+                                                    condiArr: [
+                                                        {
+                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "properties" },
+                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "$defs" }
+                                                        }
+                                                    ]
+                                                },
+                                                hasProperty: { key: "items", from: { getStorage: "prevReference" } }
+                                            },
+
+                                        ],
+                                        getters: {
+                                            getConcatinate: [{ getStorage: "path" }, "/prefixItems"]
+                                        }
+                                    },
+                                    //additionalItmes -----------------> items
+                                    {
+                                        conditions: [
+                                            {
+                                                isEqual: { value1: "additionalItems", value2: { getStorage: "_$value_" } },
+                                                not: {
+                                                    condiArr: [
+                                                        {
+                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "properties" },
+                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "$defs" }
+                                                        }
+                                                    ]
+                                                },
+                                                hasProperty: { key: "additionalItems", from: { getStorage: "prevReference" } }
+                                            },
+
+                                        ],
+                                        getters: {
+                                            getConcatinate: [{ getStorage: "path" }, "/items"]
+                                        }
+                                    },
+
+                                    //----------------------default-----------------------------
+                                    { getters: { getConcatinate: [{ getStorage: "path" }, '/', { getStorage: "_$value_" }] } }
+
+                                ]
+                            },
+                            "prevReference": {
+                                current: { getReference: { path: { getRootUri: { uri: { getValue: null } } } } },
+                                updater: [
+                                    { conditions: [{ "isEqual": { value1: "#", value2: { getStorage: "_$value_" } } }] },
+                                    { getters: { getReference: { path: { getConcatinate: ['#/', { getStorage: "_$value_" }] }, from: { getStorage: "prevReference" } } } }
+                                ]
+                            },
+                            "prevKey": {
+                                updater: [
+                                    { getters: { getStorage: "_$value_" } }
+                                ]
+                            }
+                        },
+
+                        operations: {
+                            "updateValue": { value: { getStorage: "path" } }
+                        }
+                    }
                 }
-              },
-  
-              operations: {
-                "updateValue": { value: { getStorage: "path" } }
-              }
             }
-          }
-        },
-    }
-]
+
+
 ```
 
 
@@ -131,9 +157,9 @@ const transformRule = [
 * For `array` and `object`it iterate from noramlly from the element
 * Value Iterator maintain the variable  `_$value_` and `_$key_`  which represent the current value and key of the iteration which can be accessed using the `getStorage` method which is the one of the method of the `Getters methods`
 * `targetValue` is the value on which iteration is perform 
-* `defineStorage` is the one of the property of the Value Iterator which is used to define the *Varaibles* , in  example *keys* are the name of the varaibels and *value* have the property which is used by the DSL to update the variables.
+* `defineStorage` is the one of the property of the Value Iterator which is used to define the *Varaibles* , in  example *keys* are the name of the varaibels and *value* have the property which is used by the valueIterator to update the variables.
 * `Current` is the property of the each of the defined variable it's value is used to set the initial value of the variable.
-* `getReference` is the one of the methods of the `Getters method` which return the value/reference (if object) of the key , this is the main method which is responsible to solve the $ref of the `Json Schema` will be explain in later in detail
+* `getReference` is the one of the methods of the `Getters method` which return the value/reference (if object) of the key , this is the main method which is responsible to solve the json pointers of the `Json Schema` will be explain in later in detail
 * `updater` is the property which performed for every iteration to update the current value of the *variable* , it is the array of the object in each object 2 proeprties are there `condtion` and `getters` only one updater is performed (which is under the `getters` ) from the `updater` array on the satisfaction of its respective condtion.
 * Finally `condtions` and `opertions` are the properties of the `valueiterator` which is use to perform final operation on the target which is filter from the first conditon (line 65 of above code ) when the `condtions` is satisfied ( we can leave this condtion if we want  uncondtional operation  )
 
@@ -147,12 +173,16 @@ const transformRule = [
  
 #### How this transformation rule transforming the $ref for JSON SCHEMA 2019 to 2020: 
 * This rule iterate from the fragment of the $ref and like if https://.....#/some1/some2 then it iterate from the ["some1" , "some2"] and then it check the condtitions
-    - For "items" it check if it's reference have the sibling of {"type" : "array"} if yes then it append the /prefixItems to the current value of the "path" variable
-    - For "additionalItems" also it check the same conditions as the items and if satisfied then append the /otems to the current value
+    - For "items" and additionalItmes we check that if the prevKey variable which we define to maintain the previous key appear in the `$ref` value is not an `properties` and `$def`  [example](https://docs.google.com/document/d/13Pr-QSI8Dxb5MdlHdSjM70GWAZzyyFbJ7dfrETWOTJ0/edit#heading=h.awn2hv3pq6sh) , [exmple2](https://docs.google.com/document/d/13Pr-QSI8Dxb5MdlHdSjM70GWAZzyyFbJ7dfrETWOTJ0/edit#heading=h.um7ir9w76c0p)
+    - Then if the condition get staisfied we update the path variable value using the `getConcatinate` method which concaticate the *path* variable previous value to the / prefixItems and assign it to the current of the path variable same for additionalItems
+    
     - Now last  `getters` is for the default condtion in which we append the `_$value_` as it is in path.
 * Preverference always maintain the reference to the previous fragment value and it is used in the condtion of the path variable
     - Its Update have 2 obj one is without `getters` and another is without `conditions` so first obj is just for the ignore the first case ( `_$value_` = "#" ) bcz in this case we dont waana do any thing
-    - Now in second obj we always have to update the prevreference using the current _$value_ unconditionally. In this obj we are concatinating the #/ with the `_$value_` to get the reference of the current value WRT the `from` in which we are taking the previous value of prereference variable
+    - Now in second obj we always have to update the prevreference using the current _$value_ unconditionally. In this obj we are concatinating the #/ with the `_$value_` to get the reference of the current value WRT the `from` in which we are taking the previous value of prereference variable.
+    - prevKey is another variable which maintain the previous key appear in the `$ref` value
+ 
+  `Operation` finally perform the operation on the `$ref` by updating the its value to the `path` variable
 
    
 
