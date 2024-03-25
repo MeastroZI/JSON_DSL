@@ -89,6 +89,7 @@ const transformRule = [
                     }
                 }
             },
+            // recursiveAnchor -------------------------------> dynamicAnchor
             {
                 "conditions": [
                     {
@@ -119,6 +120,7 @@ const transformRule = [
                     }
                 }
             },
+            //recursiveRef ------> dynamicRef
             {
                 "conditions": [
                     {
@@ -149,6 +151,7 @@ const transformRule = [
                     }
                 }
             },
+            //items --------> prefixItems
             {
                 "conditions": [
                     {
@@ -170,6 +173,7 @@ const transformRule = [
                     }
                 }
             },
+            //additionalItems ----------------> items
             {
                 "conditions": [
                     {
@@ -191,6 +195,7 @@ const transformRule = [
                     }
                 }
             },
+            // schema uri change
             {
                 "conditions": [
                     {
