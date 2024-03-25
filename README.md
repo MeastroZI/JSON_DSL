@@ -144,7 +144,7 @@ const condOperMapper = [{
 ```
 
 
-```valueIterator``` is the one of the method from  ```OperationsMethod``` it iterate from the value of the key which filter from the <br> ```conditions: [{ "isKey": { key: "$ref" }, "valuePattern": ".*\\/items\\/.*" }]``` <br> condtions will filter the element which have the key   ```$ref``` and its value follow the json schema pattern ```.*\\/items\\/.*```
+```valueIterator``` is the one of the method from  ```OperationsMethod``` it iterate from the value of the key which filter from the <br> ```conditions: [{ "isKey": { key: "$ref" }, "valuePattern": ".*\\/items\\/.*" }]``` <br> condtions will filter out the element which have the key   ```$ref``` and its value follow the json schema pattern ```.*\\/items\\/.*```
 <br> <br>
 #### About Conditions Property : 
 * Condtions is the array of the ```Condtion methods ```
@@ -186,9 +186,12 @@ const condOperMapper = [{
 
    
 
+## getReference 
 
-
-
+- This method is used to get the value/reference(if Object) of the path given in the `path` attribute
+- If path is startWith #.../ then path is resolve wth respect to the current element for which conditions is checking or operation is performing
+- It have `from` property which is the object from where we need to get the path resolve , if `from` property is given then path must start with the '#'
+- If `from` attibute is not given and even path is not start with '#.../' in that case getReference resolve the path using base URI ( nearest $id , $anchore or etc ) and that resolved path which is the full URI is searched on the OBJECT which is made in the analysis state of the DSL which have all the reference to the Object map with the uri where baseUri get change. 
 
 
 
