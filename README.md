@@ -53,7 +53,7 @@ this is the one of example of the rule for DSL , in this <br>
 
 
 
-Now let see the one of the rule which have littlbit complex syntex compare to others 
+## Transformation rule to update the `$ref`
 
 ```js
 const condOperMapper = [{
