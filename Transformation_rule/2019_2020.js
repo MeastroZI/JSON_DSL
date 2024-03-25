@@ -1,7 +1,5 @@
 const { Convert } = require("../lib/DSL")
 
-// this is the DSL rule to solve the ref problem of the json schema of the draft 2020 12  , the main thing which Solve this problem is the getRefernce logic in the DSL in Getters Object
-
 
 
 const transformRule = [
@@ -21,7 +19,7 @@ const transformRule = [
                         defineStorage: {
                             "path": {
 
-                                current: { "getConcatinate": [{ "getUriWithoutFragment": { uri: { "getValue": null } } }, '#'] },
+                                current: { getConcatinate: [{ getUriWithoutFragment: { uri: { "getValue": null } } }, '#'] },
                                 updater: [
                                     // items -------------------------> prefixItems
                                     {
@@ -36,7 +34,7 @@ const transformRule = [
                                                         }
                                                     ]
                                                 },
-                                               hasProperty : { key : "items" , from : {getStorage : "prevReference"}}
+                                                hasProperty: { key: "items", from: { getStorage: "prevReference" } }
                                             },
 
                                         ],
@@ -57,7 +55,7 @@ const transformRule = [
                                                         }
                                                     ]
                                                 },
-                                               hasProperty : { key : "additionalItems" , from : {getStorage : "prevReference"}}
+                                                hasProperty: { key: "additionalItems", from: { getStorage: "prevReference" } }
                                             },
 
                                         ],
@@ -84,70 +82,130 @@ const transformRule = [
                                 ]
                             }
                         },
-
+                        // changing value of $ref to the path
                         operations: {
                             "updateValue": { value: { getStorage: "path" } }
                         }
                     }
                 }
             },
-            
-            // //*****************************$recursiveAnchor Tramsformation********************** */
-            // {
-            //     conditions: [{ "hasChild": { childName: "$recursiveAnchor" } }],
-            //     operations: {
-            //         "updateValue": { key: "$recursiveAnchor", parent: { getReference: { path: "#.../" } }, value: "node" },
-            //         "editChildKey": { key: "$recursiveAnchor", newKey: "$dynamicAnchor" }
-            //     }
+            {
+                "conditions": [
+                    {
+                        "hasChild": {
+                            "childName": "$recursiveAnchor"
+                        },
+                        "not": {
+                            "condiArr": [
+                                { "isKey": { "key": "properties" } },
+                                { "isKey": { "key": "$def" } }
+                            ]
+                        }
+                    }
+                ],
+                "operations": {
+                    "updateValue": {
+                        "key": "$recursiveAnchor",
+                        "from": {
+                            "getReference": {
+                                "path": "#.../"
+                            }
+                        },
+                        "value": "anchor"
+                    },
+                    "editChildKey": {
+                        "key": "$recursiveAnchor",
+                        "newKey": "$dynamicAnchor"
+                    }
+                }
+            },
+            {
+                "conditions": [
+                    {
+                        "hasChild": {
+                            "childName": "$recursiveRef"
+                        },
+                        "not": {
+                            "condiArr": [
+                                { "isKey": { "key": "properties" } },
+                                { "isKey": { "key": "$def" } }
+                            ]
+                        }
+                    }
+                ],
+                "operations": {
+                    "updateValue": {
+                        "key": "$recursiveRef",
+                        "from": {
+                            "getReference": {
+                                "path": "#.../"
+                            }
+                        },
+                        "value": "#anchor"
+                    },
+                    "editChildKey": {
+                        "key": "$recursiveRef",
+                        "newKey": "$dynamicRef"
+                    }
+                }
+            },
+            {
+                "conditions": [
+                    {
+                        "hasChild": {
+                            "childName": "items"
+                        },
+                        "not": {
+                            "condiArr": [
+                                { "isKey": { "key": "properties" } },
+                                { "isKey": { "key": "$def" } }
+                            ]
+                        }
+                    }
+                ],
+                "operations": {
+                    "editChildKey": {
+                        "key": "items",
+                        "newKey": "prefixItems"
+                    }
+                }
+            },
+            {
+                "conditions": [
+                    {
+                        "hasChild": {
+                            "childName": "additionalItems"
+                        },
+                        "not": {
+                            "condiArr": [
+                                { "isKey": { "key": "properties" } },
+                                { "isKey": { "key": "$def" } }
+                            ]
+                        }
+                    }
+                ],
+                "operations": {
+                    "editChildKey": {
+                        "key": "additionalItems",
+                        "newKey": "items"
+                    }
+                }
+            },
+            {
+                "conditions": [
+                    {
+                        "isKey": {
+                            "key": "$schema"
+                        }
+                    }
+                ],
+                "operations": {
+                    "updateValue": {
+                        "value": "https://json-schema.org/draft/2020-12/schema"
+                    }
+                }
+            },
 
-            // },
-            // /*********************************$recursiveRef Transformation********************* */
-            // {
-            //     conditions: [{ "hasChild": { childName: "$recursiveRef" } }],
-            //     operations: {
-            //         "updateValue": { key: "$recursiveRef", parent: { getReference: { path: "#.../" } }, value: "#node" },
-            //         "editChildKey": { key: "$recursiveRef", newKey: "$dynamicRef" }
-            //     }
-
-            // },
-            // /**********************************Items ----> prefixItems ***************************/
-
-            // {
-            //     conditions:
-            //         [{
-            //             "hasChild": { childName: "items" },
-            //             "hasSibling": { key: "type", value: "array", from: { getReference: { path: "#.../" } } }
-            //         }],
-
-            //     operations: {
-            //         "editChildKey": { key: "items", newKey: "prefixItems" }
-            //     }
-
-            // },
-
-            // /*******************additionalItems ---> items *********************/
-            // {
-            //     conditions:
-            //         [{
-            //             "hasChild": { childName: "additionalItems" },
-            //             "hasSibling": { key: "type", value: "array", from: { getReference: { path: "#.../" } } }
-            //         }],
-
-            //     operations: {
-            //         "editChildKey": { key: "additionalItems", newKey: "items" }
-            //     }
-
-            // },
-
-
-
-
-            // //*****************************$schema Transformation *********************************/
-            // {
-            //     conditions: [{ "isKey": { key: "$schema" } }],
-            //     operations: { "updateValue": { value: "https://json-schema.org/draft/2020-12/schema" } }
-
-            // }
         ]
 
     }

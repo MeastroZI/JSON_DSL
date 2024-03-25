@@ -1,0 +1,313 @@
+[
+    {
+      "path": "*",
+      "condOperMapper": [
+        {
+            "conditions": [
+              {
+                "hasChild": {
+                  "childName": "$recursiveAnchor"
+                },
+                "not" : {"condiArr":[
+                    {"isKey" : {"key" : "properties"}},
+                    {"isKey" : {"key" : "$def"}}
+                ]}
+              }
+            ],
+            "operations": {
+              "updateValue": {
+                "key": "$recursiveAnchor",
+                "from": {
+                  "getReference": {
+                    "path": "#.../"
+                  }
+                },
+                "value": "anchor"
+              },
+              "editChildKey": {
+                "key": "$recursiveAnchor",
+                "newKey": "$dynamicAnchor"
+              }
+            }
+          },
+          {
+            "conditions": [
+              {
+                "hasChild": {
+                  "childName": "$recursiveRef"
+                },
+                "not" : {"condiArr":[
+                    {"isKey" : {"key" : "properties"}},
+                    {"isKey" : {"key" : "$def"}}
+                ]}
+              }
+            ],
+            "operations": {
+              "updateValue": {
+                "key": "$recursiveRef",
+                "from": {
+                  "getReference": {
+                    "path": "#.../"
+                  }
+                },
+                "value": "#anchor"
+              },
+              "editChildKey": {
+                "key": "$recursiveRef",
+                "newKey": "$dynamicRef"
+              }
+            }
+          },
+          {
+            "conditions": [
+              {
+                "hasChild": {
+                  "childName": "items"
+                },
+                "not" : {"condiArr":[
+                    {"isKey" : {"key" : "properties"}},
+                    {"isKey" : {"key" : "$def"}}
+                ]}
+              }
+            ],
+            "operations": {
+              "editChildKey": {
+                "key": "items",
+                "newKey": "prefixItems"
+              }
+            }
+          },
+          {
+            "conditions": [
+                {
+                  "hasChild": {
+                    "childName": "additionalItems"
+                  },
+                  "not" : {"condiArr":[
+                      {"isKey" : {"key" : "properties"}},
+                      {"isKey" : {"key" : "$def"}}
+                  ]}
+                }
+              ],
+            "operations": {
+              "editChildKey": {
+                "key": "additionalItems",
+                "newKey": "items"
+              }
+            }
+          },
+          {
+            "conditions": [
+              {
+                "isKey": {
+                  "key": "$schema"
+                }
+              }
+            ],
+            "operations": {
+              "updateValue": {
+                "value": "https://json-schema.org/draft/2020-12/schema"
+              }
+            }
+          },
+
+
+
+
+
+          {
+            "conditions": [
+              {
+                "isKey": {
+                  "key": "$ref"
+                },
+                "valuePattern": ".*\\bitems\\b.*"
+              },
+              {
+                "isKey": {
+                  "key": "$ref"
+                },
+                "valuePattern": ".*\\badditionalItems\\b.*"
+              }
+            ],
+            "operations": {
+              "valueIterator": {
+                "targetValue": {
+                  "getFragmentUri": null
+                },
+                "type": "string",
+                "splitBy": "/",
+                "defineStorage": {
+                  "path": {
+                    "current": {
+                      "getConcatinate": [
+                        {
+                          "getUriWithoutFragment": {
+                            "uri": {
+                              "getValue": null
+                            }
+                          }
+                        },
+                        "#"
+                      ]
+                    },
+                    "updater": [
+                      {
+                        "conditions": [
+                          {
+                            "isEqual": {
+                              "value1": "items",
+                              "value2": {
+                                "getStorage": "_$value_"
+                              }
+                            },
+                            "not": {
+                              "condiArr": [
+                                {
+                                  "isEqual": {
+                                    "value1": {
+                                      "getStorage": "prevKey"
+                                    },
+                                    "value2": "$defs"
+                                  }
+                                }
+                              ]
+                            },
+                            "hasProperty": {
+                              "key": "items",
+                              "from": {
+                                "getStorage": "prevReference"
+                              }
+                            }
+                          }
+                        ],
+                        "getters": {
+                          "getConcatinate": [
+                            {
+                              "getStorage": "path"
+                            },
+                            "/prefixItems"
+                          ]
+                        }
+                      },
+                      {
+                        "conditions": [
+                          {
+                            "isEqual": {
+                              "value1": "additionalItems",
+                              "value2": {
+                                "getStorage": "_$value_"
+                              }
+                            },
+                            "not": {
+                              "condiArr": [
+                                {
+                                  "isEqual": {
+                                    "value1": {
+                                      "getStorage": "prevKey"
+                                    },
+                                    "value2": "$defs"
+                                  }
+                                }
+                              ]
+                            },
+                            "hasProperty": {
+                              "key": "additionalItems",
+                              "from": {
+                                "getStorage": "prevReference"
+                              }
+                            }
+                          }
+                        ],
+                        "getters": {
+                          "getConcatinate": [
+                            {
+                              "getStorage": "path"
+                            },
+                            "/items"
+                          ]
+                        }
+                      },
+                      {
+                        "getters": {
+                          "getConcatinate": [
+                            {
+                              "getStorage": "path"
+                            },
+                            "/",
+                            {
+                              "getStorage": "_$value_"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "prevReference": {
+                    "current": {
+                      "getReference": {
+                        "path": {
+                          "getRootUri": {
+                            "uri": {
+                              "getValue": null
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "updater": [
+                      {
+                        "conditions": [
+                          {
+                            "isEqual": {
+                              "value1": "#",
+                              "value2": {
+                                "getStorage": "_$value_"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "getters": {
+                          "getReference": {
+                            "path": {
+                              "getConcatinate": [
+                                "#/",
+                                {
+                                  "getStorage": "_$value_"
+                                }
+                              ]
+                            },
+                            "from": {
+                              "getStorage": "prevReference"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "prevKey": {
+                    "updater": [
+                      {
+                        "getters": {
+                          "getStorage": "_$value_"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "operations": {
+                  "updateValue": {
+                    "value": {
+                      "getStorage": "path"
+                    }
+                  }
+                }
+              }
+            }
+          }
+      ]
+    }
+  ]
+  

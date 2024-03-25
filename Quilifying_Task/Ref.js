@@ -7,7 +7,7 @@ const transformRule = [
         path: "*",
         condOperMapper: [
             //*****************************$ref Transformation********************************** */
-            {
+             {
                 conditions: [
                     { "isKey": { key: "$ref" }, "valuePattern": ".*\\bitems\\b.*" },
                     { "isKey": { key: "$ref" }, "valuePattern": ".*\\badditionalItems\\b.*" }
@@ -18,12 +18,14 @@ const transformRule = [
                         type: "string", splitBy: "/",
                         defineStorage: {
                             "path": {
-                                current: { "getConcatinate": [{ "getUriWithoutFragment": { uri: { "getValue": null } } }, '#'] },
+
+                                current: { getConcatinate: [{ getUriWithoutFragment: { uri: { "getValue": null } } }, '#'] },
                                 updater: [
-                                    // items ----------------->  prefixItems
-                                    { conditions: [
-                                            { 
-                                                isEqual: { value1: "items", value2: { getStorage: "_$value_" } } ,
+                                    // items -------------------------> prefixItems
+                                    {
+                                        conditions: [
+                                            {
+                                                isEqual: { value1: "items", value2: { getStorage: "_$value_" } },
                                                 not: {
                                                     condiArr: [
                                                         {
@@ -31,58 +33,69 @@ const transformRule = [
                                                             isEqual: { value1: { getStorage: "prevKey" }, value2: "$defs" }
                                                         }
                                                     ]
-                                                }
+                                                },
+                                                hasProperty: { key: "items", from: { getStorage: "prevReference" } }
                                             },
-                                           
+
                                         ],
                                         getters: {
                                             getConcatinate: [{ getStorage: "path" }, "/prefixItems"]
                                         }
                                     },
-                                    // aditionalitems -----------------> items
+                                    //additionalItmes -----------------> items
                                     {
                                         conditions: [
                                             {
-                                                 isEqual: { value1: "additionalItems", value2: { getStorage: "_$value_" } },
-                                                 not: {
+                                                isEqual: { value1: "additionalItems", value2: { getStorage: "_$value_" } },
+                                                not: {
                                                     condiArr: [
                                                         {
                                                             isEqual: { value1: { getStorage: "prevKey" }, value2: "properties" },
                                                             isEqual: { value1: { getStorage: "prevKey" }, value2: "$defs" }
                                                         }
                                                     ]
-                                                }
+                                                },
+                                                hasProperty: { key: "additionalItems", from: { getStorage: "prevReference" } }
                                             },
-                                           
+
                                         ],
                                         getters: {
                                             getConcatinate: [{ getStorage: "path" }, "/items"]
                                         }
                                     },
-                                    //default 
-                                    {
-                                        getters: { getConcatinate: [{ getStorage: "path" }, "/", { getStorage: "_$value_" }] }
-                                    }
+
+                                    //***********************default**************************
+
+                                    { getters: { getConcatinate: [{ getStorage: "path" }, '/', { getStorage: "_$value_" }] } }
+
                                 ]
                             },
-
+                            "prevReference": {
+                                current: { getReference: { path: { getRootUri: { uri: { getValue: null } } } } },
+                                updater: [
+                                    { conditions: [{ "isEqual": { value1: "#", value2: { getStorage: "_$value_" } } }] },
+                                    { getters: { getReference: { path: { getConcatinate: ['#/', { getStorage: "_$value_" }] }, from: { getStorage: "prevReference" } } } }
+                                ]
+                            },
                             "prevKey": {
-                                updater: [{ getters: { getStorage: "_$value_" } }]
+                                updater: [
+                                    { getters: { getStorage: "_$value_" } }
+                                ]
                             }
                         },
-                        // final operation of updating the $ref 
-                        operations : {
-                            "updateValue" : { value : {getStorage : "path"}}
+                        // changing value of $ref to the path
+                        operations: {
+                            "updateValue": { value: { getStorage: "path" } }
                         }
                     }
                 }
-            }
+            },
         ]
 
     }
 ]
 
-// this examples are taken from teh JSON schema examples and change littlbit for testing if any validation error is found then ignore please
+// this examples are taken from teh JSON schema examples and changed littlbit for testing if any validation error is found then ignore please
 const refJsonTest = [
     {
         "$id": "https://example.com/blog-post.schema.json",
