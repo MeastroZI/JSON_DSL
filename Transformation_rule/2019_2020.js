@@ -189,6 +189,7 @@ const refJsonTest = [
         "type": "object",
         "required": ["title", "content", "author"],
         "properties": {
+            "items":{},
             "title": {
                 "type": "array",
                 "items": [
