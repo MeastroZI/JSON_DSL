@@ -7,169 +7,136 @@ const transformRule = [
         path: "*",
         condOperMapper: [
             //*****************************$ref Transformation********************************** */
-            {
-                conditions: [
-                    { "isKey": { key: "$ref" }, "valuePattern": ".*\\bitems\\b.*" },
-                    { "isKey": { key: "$ref" }, "valuePattern": ".*\\badditionalItems\\b.*" }
-                ],
-                operations: {
-                    "valueIterator": {
-                        targetValue: { getFragmentUri: null },
-                        type: "string", splitBy: "/",
-                        defineStorage: {
-                            "path": {
+            // {
+            //     conditions: [
+            //         { "isKey": { key: "$ref" }, "valuePattern": ".*\\bitems\\b.*" },
+            //         { "isKey": { key: "$ref" }, "valuePattern": ".*\\badditionalItems\\b.*" }
+            //     ],
+            //     operations: {
+            //         "valueIterator": {
+            //             targetValue: { getFragmentUri: null },
+            //             type: "string", splitBy: "/",
+            //             defineStorage: {
+            //                 "path": {
 
-                                current: { getConcatinate: [{ getUriWithoutFragment: { uri: { "getValue": null } } }, '#'] },
-                                updater: [
-                                    // items -------------------------> prefixItems
-                                    {
-                                        conditions: [
-                                            {
-                                                isEqual: { value1: "items", value2: { getStorage: "_$value_" } },
-                                                not: {
-                                                    condiArr: [
-                                                        {
-                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "properties" },
-                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "$defs" }
-                                                        }
-                                                    ]
-                                                },
-                                                hasProperty: { key: "items", from: { getStorage: "prevReference" } }
-                                            },
+            //                     current: { getConcatinate: [{ getUriWithoutFragment: { uri: { "getValue": null } } }, '#'] },
+            //                     updater: [
+            //                         // items -------------------------> prefixItems
+            //                         {
+            //                             conditions: [
+            //                                 {
+            //                                     isEqual: { value1: "items", value2: { getStorage: "_$value_" } },
+            //                                     not: {
+            //                                         condiArr: [
+            //                                             {
+            //                                                 isEqual: { value1: { getStorage: "prevKey" }, value2: "properties" },
+            //                                                 isEqual: { value1: { getStorage: "prevKey" }, value2: "$defs" }
+            //                                             }
+            //                                         ]
+            //                                     },
+            //                                     hasProperty: { key: "items", from: { getStorage: "prevReference" } }
+            //                                 },
 
-                                        ],
-                                        getters: {
-                                            getConcatinate: [{ getStorage: "path" }, "/prefixItems"]
-                                        }
-                                    },
-                                    //additionalItmes -----------------> items
-                                    {
-                                        conditions: [
-                                            {
-                                                isEqual: { value1: "additionalItems", value2: { getStorage: "_$value_" } },
-                                                not: {
-                                                    condiArr: [
-                                                        {
-                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "properties" },
-                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "$defs" }
-                                                        }
-                                                    ]
-                                                },
-                                                hasProperty: { key: "additionalItems", from: { getStorage: "prevReference" } }
-                                            },
+            //                             ],
+            //                             getters: {
+            //                                 getConcatinate: [{ getStorage: "path" }, "/prefixItems"]
+            //                             }
+            //                         },
+            //                         //additionalItmes -----------------> items
+            //                         {
+            //                             conditions: [
+            //                                 {
+            //                                     isEqual: { value1: "additionalItems", value2: { getStorage: "_$value_" } },
+            //                                     not: {
+            //                                         condiArr: [
+            //                                             {
+            //                                                 isEqual: { value1: { getStorage: "prevKey" }, value2: "properties" },
+            //                                                 isEqual: { value1: { getStorage: "prevKey" }, value2: "$defs" }
+            //                                             }
+            //                                         ]
+            //                                     },
+            //                                     hasProperty: { key: "additionalItems", from: { getStorage: "prevReference" } }
+            //                                 },
 
-                                        ],
-                                        getters: {
-                                            getConcatinate: [{ getStorage: "path" }, "/items"]
-                                        }
-                                    },
+            //                             ],
+            //                             getters: {
+            //                                 getConcatinate: [{ getStorage: "path" }, "/items"]
+            //                             }
+            //                         },
 
-                                    //----------------------default-----------------------------
-                                    { getters: { getConcatinate: [{ getStorage: "path" }, '/', { getStorage: "_$value_" }] } }
+            //                         //----------------------default-----------------------------
+            //                         { getters: { getConcatinate: [{ getStorage: "path" }, '/', { getStorage: "_$value_" }] } }
 
-                                ]
-                            },
-                            "prevReference": {
-                                current: { getReference: { path: { getRootUri: { uri: { getValue: null } } } } },
-                                updater: [
-                                    { conditions: [{ "isEqual": { value1: "#", value2: { getStorage: "_$value_" } } }] },
-                                    { getters: { getReference: { path: { getConcatinate: ['#/', { getStorage: "_$value_" }] }, from: { getStorage: "prevReference" } } } }
-                                ]
-                            },
-                            "prevKey": {
-                                updater: [
-                                    { getters: { getStorage: "_$value_" } }
-                                ]
-                            }
-                        },
-                        // changing value of $ref to the path
-                        operations: {
-                            "updateValue": { value: { getStorage: "path" } }
-                        }
-                    }
-                }
-            },
+            //                     ]
+            //                 },
+            //                 "prevReference": {
+            //                     current: { getReference: { path: { getRootUri: { uri: { getValue: null } } } } },
+            //                     updater: [
+            //                         { conditions: [{ "isEqual": { value1: "#", value2: { getStorage: "_$value_" } } }] },
+            //                         { getters: { getReference: { path: { getConcatinate: ['#/', { getStorage: "_$value_" }] }, from: { getStorage: "prevReference" } } } }
+            //                     ]
+            //                 },
+            //                 "prevKey": {
+            //                     updater: [
+            //                         { getters: { getStorage: "_$value_" } }
+            //                     ]
+            //                 }
+            //             },
+            //             // changing value of $ref to the path
+            //             operations: {
+            //                 "updateValue": { value: { getStorage: "path" } }
+            //             }
+            //         }
+            //     }
+            // },
+
+
             // recursiveAnchor -------------------------------> dynamicAnchor
             {
                 "conditions": [
                     {
-                        "hasChild": {
-                            "childName": "$recursiveAnchor"
-                        },
-                        "not": {
-                            "condiArr": [
-                                { "isKey": { "key": "properties" } },
-                                { "isKey": { "key": "$def" } }
-                            ]
-                        }
+                        "isKey": {"key" : "recursiveAnchor"} 
                     }
                 ],
                 "operations": {
                     "updateValue": {
-                        "key": "$recursiveAnchor",
-                        "from": {
-                            "getReference": {
-                                "path": "#.../"
-                            }
-                        },
                         "value": "anchor"
                     },
-                    "editChildKey": {
-                        "key": "$recursiveAnchor",
-                        "newKey": "$dynamicAnchor"
+                    "editKey": {
+                        "Key": "$dynamicAnchor"
                     }
                 }
             },
+            
             //recursiveRef ------> dynamicRef
             {
                 "conditions": [
                     {
-                        "hasChild": {
-                            "childName": "$recursiveRef"
-                        },
-                        "not": {
-                            "condiArr": [
-                                { "isKey": { "key": "properties" } },
-                                { "isKey": { "key": "$def" } }
-                            ]
-                        }
+                        "isKey": {"key" : "recursiveRef"} 
                     }
                 ],
                 "operations": {
                     "updateValue": {
-                        "key": "$recursiveRef",
-                        "from": {
-                            "getReference": {
-                                "path": "#.../"
-                            }
-                        },
                         "value": "#anchor"
                     },
-                    "editChildKey": {
-                        "key": "$recursiveRef",
-                        "newKey": "$dynamicRef"
+                    "editKey": {
+                        "Key": "$dynamicRef"
                     }
                 }
             },
+
             //items --------> prefixItems
             {
                 "conditions": [
                     {
-                        "hasChild": {
-                            "childName": "items"
-                        },
-                        "not": {
-                            "condiArr": [
-                                { "isKey": { "key": "properties" } },
-                                { "isKey": { "key": "$def" } }
-                            ]
+                        "isKey" : {
+                            "key" : "items"
                         }
                     }
                 ],
                 "operations": {
-                    "editChildKey": {
-                        "key": "items",
-                        "newKey": "prefixItems"
+                    "editKey": {
+                        "key": "prefixItems"
                     }
                 }
             },
@@ -177,21 +144,14 @@ const transformRule = [
             {
                 "conditions": [
                     {
-                        "hasChild": {
-                            "childName": "additionalItems"
-                        },
-                        "not": {
-                            "condiArr": [
-                                { "isKey": { "key": "properties" } },
-                                { "isKey": { "key": "$def" } }
-                            ]
+                        "isKey" : {
+                            "key" : "additionalItems"
                         }
                     }
                 ],
                 "operations": {
-                    "editChildKey": {
-                        "key": "additionalItems",
-                        "newKey": "items"
+                    "editKey": {
+                        "key": "items"
                     }
                 }
             },
@@ -408,8 +368,10 @@ const refJsonTest = [
 
 let count = 1
 console.log("\n\n\n\n")
+const walkers = require("../walkers/jsonschema-2019-09.json")
+
 for (const elm of refJsonTest) {
-    const instance = Convert(transformRule, elm)
+    const instance = Convert(transformRule, elm , walkers)
     const analyseResult = instance.analyseSchemaIds()
     const result = instance.applytransformations()
     console.log(`**************************************Schema ${count}********************************************`)
