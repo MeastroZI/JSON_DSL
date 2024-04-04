@@ -186,7 +186,7 @@ Each tranformation object in array is performed with the different iteration on 
 
 
 
-NOTE : Empty `conditions` array or not provided `conditions` is resolve to the True , so this DSL can be used as the normal DSL like json merge and json patch and for condtions for the json schema Transformation we can use the AJV as done in the [alterschema](https://github.com/sourcemeta/alterschema).
+NOTE : Empty `conditions` array or not provided `conditions` is resolve to the True , so this DSL can be used as the normal DSL like json merge and json patch . For the conditions of json schema Transformation we can use the AJV as done in the [alterschema](https://github.com/sourcemeta/alterschema).
 
 
 
@@ -222,7 +222,7 @@ NOTE : Empty `conditions` array or not provided `conditions` is resolve to the T
  
 ### How this transformation rule transforming the $ref for JSON SCHEMA 2019 to 2020: 
 
-this is the updater of the path variable 
+this is the updater of the path variable which update the path variable 
 
 Ex : 
 ------------------------------item to prefixItems----------------------------------------
