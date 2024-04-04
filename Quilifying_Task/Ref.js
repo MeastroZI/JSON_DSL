@@ -4,99 +4,169 @@ const { Convert } = require("../lib/DSL")
 
 const transformRule = [
     {
-        path: "*",
+        path: { walkers: "jsonschema-2019-09" },
         condOperMapper: [
-            //*****************************$ref Transformation********************************** */
-             {
+
+            // recursiveAnchor -------------------------------> dynamicAnchor
+            {
+                "conditions": [
+                    {
+                        "isKey": { "key": "$recursiveAnchor" }
+                    }
+                ],
+                "operations": {
+                    "updateValue": {
+                        "value": "anchor"
+                    },
+                    "editKey": {
+                        "key": "$dynamicAnchor"
+                    }
+                }
+            },
+
+            //recursiveRef ------> dynamicRef
+            {
+                "conditions": [
+                    {
+                        "isKey": { "key": "$recursiveRef" }
+                    }
+                ],
+                "operations": {
+                    "updateValue": {
+                        "value": "#anchor"
+                    },
+                    "editKey": {
+                        "key": "$dynamicRef"
+                    }
+                }
+            },
+
+            //items --------> prefixItems
+            {
+                "conditions": [
+                    {
+                        "isKey": {
+                            "key": "items"
+                        }
+                    }
+                ],
+                "operations": {
+                    "editKey": {
+                        "key": "prefixItems"
+                    }
+                }
+            },
+            //additionalItems ----------------> items
+            {
+                "conditions": [
+                    {
+                        "isKey": {
+                            "key": "additionalItems"
+                        }
+                    }
+                ],
+                "operations": {
+                    "editKey": {
+                        "key": "items"
+                    }
+                }
+            },
+            // schema uri change
+            {
+                "conditions": [
+                    {
+                        "isKey": {
+                            "key": "$schema"
+                        }
+                    }
+                ],
+                "operations": {
+                    "updateValue": {
+                        "value": "https://json-schema.org/draft/2020-12/schema"
+                    }
+                }
+            },
+
+        ]
+
+    },
+    // as the whole json schema is get transform into the 2020-12 draft we need apply the 2020-12 walkers to update the $ref
+    {
+        path: { walkers: "jsonschema-2020-12" },
+        condOperMapper: [
+            {
                 conditions: [
                     { "isKey": { key: "$ref" }, "valuePattern": ".*\\bitems\\b.*" },
                     { "isKey": { key: "$ref" }, "valuePattern": ".*\\badditionalItems\\b.*" }
                 ],
+
                 operations: {
                     "valueIterator": {
                         targetValue: { getFragmentUri: null },
                         type: "string", splitBy: "/",
                         defineStorage: {
                             "path": {
-
-                                current: { getConcatinate: [{ getUriWithoutFragment: { uri: { "getValue": null } } }, '#'] },
-                                updater: [
-                                    // items -------------------------> prefixItems
+                                "current": { "getConcatinate": [{ "getUriWithoutFragment": null }, "#"] },
+                                "updater": [
+                                    //items ------------------------------> prefixItems 
                                     {
-                                        conditions: [
+                                        "conditions": [
                                             {
-                                                isEqual: { value1: "items", value2: { getStorage: "_$value_" } },
-                                                not: {
-                                                    condiArr: [
-                                                        {
-                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "properties" },
-                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "$defs" }
-                                                        }
-                                                    ]
-                                                },
-                                                hasProperty: { key: "items", from: { getStorage: "prevReference" } }
-                                            },
+                                                "isEqual": { "value1": "items", "value2": { "getStorage": "_$value_" } },
 
-                                        ],
-                                        getters: {
-                                            getConcatinate: [{ getStorage: "path" }, "/prefixItems"]
-                                        }
-                                    },
-                                    //additionalItmes -----------------> items
-                                    {
-                                        conditions: [
-                                            {
-                                                isEqual: { value1: "additionalItems", value2: { getStorage: "_$value_" } },
-                                                not: {
-                                                    condiArr: [
-                                                        {
-                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "properties" },
-                                                            isEqual: { value1: { getStorage: "prevKey" }, value2: "$defs" }
-                                                        }
-                                                    ]
-                                                },
-                                                hasProperty: { key: "additionalItems", from: { getStorage: "prevReference" } }
-                                            },
+                                                "isValidPath": {
+                                                    "getConcatinate": [{ "getStorage": "path" }, "/", "prefixItems"]
+                                                }
+                                                // i am alredy checking the conditions first that _$value_ is items or not, so that i am directly writing the items here either concistent way is to use getStorage
 
+                                            }
                                         ],
-                                        getters: {
-                                            getConcatinate: [{ getStorage: "path" }, "/items"]
+                                        "getters": {
+                                            "getConcatinate": [{ "getStorage": "path" }, "/prefixItems"]
                                         }
                                     },
 
-                                    //***********************default**************************
+                                    //additionalItems -------------------> items
+                                    {
+                                        "conditions": [
+                                            {
+                                                "isEqual": { "value1": "additionalItems", "value2": { "getStorage": "_$value_" } },
 
+
+                                                "isValidPath": {
+                                                    "getConcatinate": [{ "getStorage": "path" }, "/", "items"]
+                                                }
+
+                                            }
+                                        ],
+                                        "getters": {
+                                            "getConcatinate": [{ "getStorage": "path" }, "/items"]
+                                        }
+                                    },
+
+                                    //----------------------default-----------------------------
                                     { getters: { getConcatinate: [{ getStorage: "path" }, '/', { getStorage: "_$value_" }] } }
-
-                                ]
-                            },
-                            "prevReference": {
-                                current: { getReference: { path: { getRootUri: { uri: { getValue: null } } } } },
-                                updater: [
-                                    { conditions: [{ "isEqual": { value1: "#", value2: { getStorage: "_$value_" } } }] },
-                                    { getters: { getReference: { path: { getConcatinate: ['#/', { getStorage: "_$value_" }] }, from: { getStorage: "prevReference" } } } }
-                                ]
-                            },
-                            "prevKey": {
-                                updater: [
-                                    { getters: { getStorage: "_$value_" } }
                                 ]
                             }
                         },
-                        // changing value of $ref to the path
                         operations: {
                             "updateValue": { value: { getStorage: "path" } }
                         }
+
                     }
                 }
-            },
+            }
         ]
-
     }
 ]
 
-// this examples are taken from teh JSON schema examples and changed littlbit for testing if any validation error is found then ignore please
+
+
+
+
+// this examples are taken from teh JSON schema examples and change littlbit for testing if any validation error is found then ignore please
 const refJsonTest = [
+
     {
         "$id": "https://example.com/blog-post.schema.json",
         "$schema": "https://json-schema.org/draft/2019-12/schema",
@@ -104,6 +174,7 @@ const refJsonTest = [
         "type": "object",
         "required": ["title", "content", "author"],
         "properties": {
+            "items": {},
             "title": {
                 "type": "array",
                 "items": [
@@ -176,7 +247,7 @@ const refJsonTest = [
         "properties": {
             "name": { "type": "string" },
             "phone": { "$ref": "/schema/common#/$defs/phone" },
-            "address": { "$ref": "/schema/address#/properties/city/items/0/something/items/items/items" },
+            "address": { "$ref": "/schema/address#/properties/city/items/0/properties/items/items" },
             "address2": { "$ref": "/schema/address#/properties/city/additionalItems" }
         },
 
@@ -189,7 +260,8 @@ const refJsonTest = [
                     "address": { "type": "string" },
                     "city": {
                         "type": "array",
-                        "items": [{ "something": { "items": "", "type": "array" } }, "some", "somanother"],
+                        // just to check the transformation i made it extrimly complexe
+                        "items": [{"properties" : {"items" : {"type" : "array" , "items" : [] , "additionalItems" : {}}}}],
                         "additionalItems": { "type": "string" }
                     },
                     "postalCode": { "$ref": "/schema/common#/$defs/usaPostalCode" },
@@ -283,12 +355,22 @@ const refJsonTest = [
 
 let count = 1
 console.log("\n\n\n\n")
+// const walkers = require("../walkers/jsonschema-2019-09.json")
+
 for (const elm of refJsonTest) {
-    const instance = Convert(transformRule, elm)
+    const instance = Convert(elm)
     const analyseResult = instance.analyseSchemaIds()
-    const result = instance.applytransformations()
+    const result = instance.applytransformations(transformRule)
     console.log(`**************************************Schema ${count}********************************************`)
     console.log(JSON.stringify(result, null, 3))
     count = count + 1
     console.log("\n\n\n\n")
 }
+
+
+// const used = process.memoryUsage();
+// console.log(`Memory Usage: 
+//   - RSS: ${used.rss / 1024 / 1024} MB
+//   - Heap Total: ${used.heapTotal / 1024 / 1024} MB
+//   - Heap Used: ${used.heapUsed / 1024 / 1024} MB
+//   - External: ${used.external / 1024 / 1024} MB`);
