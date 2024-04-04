@@ -1,5 +1,7 @@
 # **Json DSL**
 
+JSON_DSL is the json based DSL which provide the condition base transformation of the json data
+
 ## Working Explaination 
 
 ![Flowchart](./Static/Chart.png)
@@ -44,11 +46,17 @@
 ]
 ```
 
+
 this is the one of example of the rule for DSL , in this <br>
 * Rule must be the array in which each element represent the rule going to perform in that iteration which represent by ```path``` , new element in the array represent the new condition and operations on json data which perform with fresh new iteration on the json data
 * Path represent the the way we want to traverse from the JSON "*" represent the recursive there are 2 more options "#" and specific path, will explain later 
 * condOperMapper , elements  which represent the condtion and operation specific operation only perform when condtions get true
 * Overall it change the value of the kye "$schema" to the "https://json-schema.org/draft/2020-12/schema"
+  
+In this path represent the target where we want to do the transformation , path can be of 3 type 
+* specific :  in this type we provide the specific path where we want to perform the transformation EX : "something/something2"
+* hashSpef (#) : this type is use to perform the transformation rule on the only on the one level of json data (no recursion ) EX : "something/something2/#" this path is perform the operation on the something2 object (no recursion just on the root level )
+* recursive (\*) :  this type is use to perform the transfromation rule recursivly EX : path : "\*" apply the rule on whole json recursivly ,  path : "something/something2/*" this will apply the transformation rule on the something2 recursivly 
 
 
 
