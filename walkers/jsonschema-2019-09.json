@@ -93,12 +93,5 @@
     "vocabulary": "https://json-schema.org/draft/2019-09/vocab/content",
     "type": "value",
     "walker": "jsonschema-2019-09"
-  },
-
-
-
-  
-  "json" : {
-    "type" : "value"
   }
 }
