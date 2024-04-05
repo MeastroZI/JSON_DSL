@@ -222,9 +222,8 @@ NOTE : Empty `conditions` array or not provided `conditions` is resolve to the T
  
 ### How this transformation rule transforming the $ref for JSON SCHEMA 2019 to 2020: 
 
-this is the updater of the path variable which update the path variable 
+this are the updaters of the path variable which update the path variable 
 
-Ex : 
 ------------------------------item to prefixItems----------------------------------------
 
 ```json
