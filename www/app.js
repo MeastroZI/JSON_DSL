@@ -38,63 +38,63 @@ function onError(error) {
 
 
 
-const DEFAULT_SCHEMA = {
-  "$schema": "https://json-schema.org/draft/2019-12",
-  "$id": "https://example.com/schema/customer",
+const DEFAULT_SCHEMA =   {
+        "$schema": "https://json-schema.org/draft/2019-12",
+        "$id": "https://example.com/schema/customer",
 
-  "type": "object",
-  "properties": {
-      "name": { "type": "string" },
-      "phone": { "$ref": "/schema/common#/$defs/phone" },
-      "address": { "$ref": "/schema/address#/properties/city/items/0/properties/items/items" },
-      "address2": { "$ref": "/schema/address#/properties/city/additionalItems" }
-  },
+        "type": "object",
+        "properties": {
+            "name": { "type": "string" },
+            "phone": { "$ref": "/schema/common#/$defs/phone" },
+            "address": { "$ref": "/schema/address#/properties/city/items/0/properties/items/items" },
+            "address2": { "$ref": "/schema/address#/properties/city/additionalItems" }
+        },
 
-  "$defs": {
-      "https://example.com/schema/address": {
-          "$id": "https://example.com/schema/address",
+        "$defs": {
+            "https://example.com/schema/address": {
+                "$id": "https://example.com/schema/address",
 
-          "type": "object",
-          "properties": {
-              "address": { "type": "string" },
-              "city": {
-                  "type": "array",
-                  // just to check the transformation i made it  complexe
-                  "items": [{"properties" : {"items" : {"type" : "array" , "items" : [] , "additionalItems" : {}}}}],
-                  "additionalItems": { "type": "string" }
-              },
-              "postalCode": { "$ref": "/schema/common#/$defs/usaPostalCode" },
-              "state": { "$ref": "#/$defs/states" }
-          },
+                "type": "object",
+                "properties": {
+                    "address": { "type": "string" },
+                    "city": {
+                        "type": "array",
+                        // just to check the transformation i made it extrimly complexe
+                        "items": [{"properties" : {"items" : {"type" : "array" , "items" : [] , "additionalItems" : {}}}}],
+                        "additionalItems": { "type": "string" }
+                    },
+                    "postalCode": { "$ref": "/schema/common#/$defs/usaPostalCode" },
+                    "state": { "$ref": "#/$defs/states" }
+                },
 
-          "$defs": {
-              "states": {
-                  "enum": []
-              }
-          }
-      },
-      "https://example.com/schema/common": {
-          "$schema": "https://json-schema.org/draft/2019-09",
-          "$id": "https://example.com/schema/common",
-          "$recursiveAnchor": true,
-          "$defs": {
-              "phone": {
-                  "type": "string",
-                  "pattern": "^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$",
-                  "$recursiveRef": "#"
-              },
-              "usaPostalCode": {
-                  "type": "string",
-                  "pattern": "^[0-9]{5}(?:-[0-9]{4})?$"
-              },
-              "unsignedInt": {
-                  "type": "integer",
-                  "minimum": 0
-              }
-          }
-      }
-  }
-}
+                "$defs": {
+                    "states": {
+                        "enum": []
+                    }
+                }
+            },
+            "https://example.com/schema/common": {
+                "$schema": "https://json-schema.org/draft/2019-09",
+                "$id": "https://example.com/schema/common",
+                "$recursiveAnchor": true,
+                "$defs": {
+                    "phone": {
+                        "type": "string",
+                        "pattern": "^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$",
+                        "$recursiveRef": "#"
+                    },
+                    "usaPostalCode": {
+                        "type": "string",
+                        "pattern": "^[0-9]{5}(?:-[0-9]{4})?$"
+                    },
+                    "unsignedInt": {
+                        "type": "integer",
+                        "minimum": 0
+                    }
+                }
+            }
+        }
+    }
 
 const editor = new CodeMirror.EditorView({
   doc: JSON.stringify(DEFAULT_SCHEMA, null, 2),

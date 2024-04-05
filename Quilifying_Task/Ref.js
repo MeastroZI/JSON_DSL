@@ -195,7 +195,7 @@ const refJsonTest = [
             "testTag": {
                 "type": "array",
                 "items": [
-                    { "$ref": "#/properties/tags/items" },
+                    { "$ref": "#/properties/tags/items/properties/items/items" },
                     { "$ref": "#/properties/testTag/items/1" }
                 ],
                 "additionalItems": {
@@ -205,7 +205,14 @@ const refJsonTest = [
             "tags": {
                 "type": "array",
                 "items": {
-                    "type": "string"
+                    "properties" : {
+                        "items" : {
+                            "type" : "array",
+                            "items" : [
+                                {"type" : "string"}
+                            ]
+                        }
+                    }
                 }
             }
         }
@@ -356,9 +363,10 @@ const refJsonTest = [
 let count = 1
 console.log("\n\n\n\n")
 // const walkers = require("../walkers/jsonschema-2019-09.json")
+const instance = Convert()
 
 for (const elm of refJsonTest) {
-    const instance = Convert(elm)
+    instance.addJsonData(elm)
     const analyseResult = instance.analyseSchemaIds()
     const result = instance.applytransformations(transformRule)
     console.log(`**************************************Schema ${count}********************************************`)

@@ -1,10 +1,16 @@
 [
   {
-    "path": { "walkers": "jsonschema-2019-09" },
+    "path": {
+      "walkers": "jsonschema-2019-09"
+    },
     "condOperMapper": [
       {
         "conditions": [
-          { "isKey": { "key": "$recursiveAnchor" } }
+          {
+            "isKey": {
+              "key": "$recursiveAnchor"
+            }
+          }
         ],
         "operations": {
           "updateValue": {
@@ -17,7 +23,11 @@
       },
       {
         "conditions": [
-          { "isKey": { "key": "$recursiveRef" } }
+          {
+            "isKey": {
+              "key": "$recursiveRef"
+            }
+          }
         ],
         "operations": {
           "updateValue": {
@@ -30,7 +40,11 @@
       },
       {
         "conditions": [
-          { "isKey": { "key": "items" } }
+          {
+            "isKey": {
+              "key": "items"
+            }
+          }
         ],
         "operations": {
           "editKey": {
@@ -40,7 +54,11 @@
       },
       {
         "conditions": [
-          { "isKey": { "key": "additionalItems" } }
+          {
+            "isKey": {
+              "key": "additionalItems"
+            }
+          }
         ],
         "operations": {
           "editKey": {
@@ -50,7 +68,11 @@
       },
       {
         "conditions": [
-          { "isKey": { "key": "$schema" } }
+          {
+            "isKey": {
+              "key": "$schema"
+            }
+          }
         ],
         "operations": {
           "updateValue": {
@@ -61,46 +83,123 @@
     ]
   },
   {
-    "path": { "walkers": "jsonschema-2020-12" },
+    "path": {
+      "walkers": "jsonschema-2020-12"
+    },
     "condOperMapper": [
       {
         "conditions": [
-          { "isKey": { "key": "$ref" }, "valuePattern": ".*\\bitems\\b.*" },
-          { "isKey": { "key": "$ref" }, "valuePattern": ".*\\badditionalItems\\b.*" }
+          {
+            "isKey": {
+              "key": "$ref"
+            },
+            "valuePattern": ".*\\bitems\\b.*"
+          },
+          {
+            "isKey": {
+              "key": "$ref"
+            },
+            "valuePattern": ".*\\badditionalItems\\b.*"
+          }
         ],
         "operations": {
           "valueIterator": {
-            "targetValue": { "getFragmentUri": null },
+            "targetValue": {
+              "getFragmentUri": null
+            },
             "type": "string",
             "splitBy": "/",
             "defineStorage": {
               "path": {
-                "current": { "getConcatinate": [{ "getUriWithoutFragment": null }, "#"] },
+                "current": {
+                  "getConcatinate": [
+                    {
+                      "getUriWithoutFragment": null
+                    },
+                    "#"
+                  ]
+                },
                 "updater": [
                   {
                     "conditions": [
-                      { "isEqual": { "value1": "items", "value2": { "getStorage": "_$value_" } } },
-                      { "isValidPath": { "getConcatinate": [{ "getStorage": "path" }, "/", "prefixItems"] } }
+                      {
+                        "isEqual": {
+                          "value1": "items",
+                          "value2": {
+                            "getStorage": "_$value_"
+                          }
+                        },
+                        "isValidPath": {
+                          "getConcatinate": [
+                            {
+                              "getStorage": "path"
+                            },
+                            "/",
+                            "prefixItems"
+                          ]
+                        }
+                      }
                     ],
                     "getters": {
-                      "getConcatinate": [{ "getStorage": "path" }, "/prefixItems"]
+                      "getConcatinate": [
+                        {
+                          "getStorage": "path"
+                        },
+                        "/prefixItems"
+                      ]
                     }
                   },
                   {
                     "conditions": [
-                      { "isEqual": { "value1": "additionalItems", "value2": { "getStorage": "_$value_" } } },
-                      { "isValidPath": { "getConcatinate": [{ "getStorage": "path" }, "/", "items"] } }
+                      {
+                        "isEqual": {
+                          "value1": "additionalItems",
+                          "value2": {
+                            "getStorage": "_$value_"
+                          }
+                        },
+                        "isValidPath": {
+                          "getConcatinate": [
+                            {
+                              "getStorage": "path"
+                            },
+                            "/",
+                            "items"
+                          ]
+                        }
+                      }
                     ],
                     "getters": {
-                      "getConcatinate": [{ "getStorage": "path" }, "/items"]
+                      "getConcatinate": [
+                        {
+                          "getStorage": "path"
+                        },
+                        "/items"
+                      ]
                     }
                   },
-                  { "getters": { "getConcatinate": [{ "getStorage": "path" }, "/", { "getStorage": "_$value_" }] } }
+                  {
+                    "getters": {
+                      "getConcatinate": [
+                        {
+                          "getStorage": "path"
+                        },
+                        "/",
+                        {
+                          "getStorage": "_$value_"
+                        }
+                      ]
+                    }
+                  }
                 ]
               }
             },
             "operations": {
-              "updateValue": { "value": { "getStorage": "path" } }
+              "updateValue": {
+                "value": {
+                  "getStorage": "path"
+                }
+              }
             }
           }
         }
