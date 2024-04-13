@@ -1,0 +1,250 @@
+[
+    {
+      "path": {
+        "walkers": "jsonschema-draft7"
+      },
+      "condOperMapper": [
+        {
+          "conditions": [
+            {
+              "isKey": {
+                "key": "$schema"
+              }
+            }
+          ],
+          "operations": [
+            {
+              "updateValue": {
+                "value": "https://json-schema.org/draft/2019-09/schema"
+              }
+            }
+          ]
+        },
+        {
+          "conditions": [
+            {
+              "isKey": {
+                "key": "$id"
+              },
+              "valuePattern": "^#"
+            }
+          ],
+          "operations": [
+            {
+              "editKey": {
+                "key": "$anchor"
+              }
+            }
+          ]
+        },
+        {
+          "conditions": [
+            {
+              "isKey": {
+                "key": "definitions"
+              },
+              "isType": {
+                "type": "object"
+              }
+            }
+          ],
+          "operations": [
+            {
+              "editKey": {
+                "key": "$defs"
+              }
+            }
+          ]
+        },
+        {
+          "conditions": [
+            {
+              "isKey": {
+                "key": "dependencies"
+              }
+            }
+          ],
+          "operations": [
+            {
+              "valueIterator": {
+                "type": "object",
+                "defineStorage": {
+                  "dependentRequire": {
+                    "current": {},
+                    "updater": [
+                      {
+                        "conditions": [
+                          {
+                            "isType": {
+                              "type": "array"
+                            }
+                          }
+                        ],
+                        "opType": "append",
+                        "getters": {
+                          "getStorage": "_$value_"
+                        }
+                      }
+                    ]
+                  },
+                  "dependentSchema": {
+                    "current": {},
+                    "updater": [
+                      {
+                        "conditions": [
+                          {
+                            "isType": {
+                              "type": "object"
+                            }
+                          }
+                        ],
+                        "opType": "append",
+                        "getters": {
+                          "getStorage": "_$value_"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "operations": [
+                  {
+                    "addSiblingProperty": {
+                      "key": "dependentRequire",
+                      "value": {
+                        "getStorage": "dependentRequire"
+                      }
+                    }
+                  },
+                  {
+                    "addSiblingProperty": {
+                      "key": "dependentSchema",
+                      "value": {
+                        "getStorage": "dependentSchema"
+                      }
+                    }
+                  },
+                  {
+                    "deletProperty": "dependencies"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": {
+        "walkers": "jsonschema-2019-09"
+      },
+      "condOperMapper": [
+        {
+          "conditions": [
+            {
+              "isKey": {
+                "key": "$ref"
+              },
+              "valuePattern": ".*\\bdefinitions\\b.*"
+            },
+            {
+              "isKey": {
+                "key": "$ref"
+              },
+              "valuePattern": ".*\\bdependencies\\b.*"
+            }
+          ],
+          "operations": [
+            {
+              "valueIterator": {
+                "targetValue": {
+                  "getFragmentUri": null
+                },
+                "type": "string",
+                "splitBy": "/",
+                "defineStorage": {
+                  "path": {
+                    "current": {
+                      "getConcatinate": [
+                        {
+                          "getUriWithoutFragment": null
+                        },
+                        "#"
+                      ]
+                    },
+                    "updater": [
+                      {
+                        "conditions": [
+                          {
+                            "isEqual": {
+                              "value1": "definitions",
+                              "value2": {
+                                "getStorage": "_$value_"
+                              }
+                            },
+                            "isValidPath": {
+                              "getConcatinate": [
+                                {
+                                  "getStorage": "path"
+                                },
+                                "/",
+                                "$defs"
+                              ]
+                            }
+                          }
+                        ],
+                        "opType": "append",
+                        "getters": "/$defs"
+                      },
+                      {
+                        "conditions": [
+                          {
+                            "isEqual": {
+                              "value1": "dependencies",
+                              "value2": {
+                                "getStorage": "_$value_"
+                              }
+                            },
+                            "isValidPath": {
+                              "getConcatinate": [
+                                {
+                                  "getStorage": "path"
+                                },
+                                "/",
+                                "dependentSchema"
+                              ]
+                            }
+                          }
+                        ],
+                        "opType": "append",
+                        "getters": "/dependentSchemas"
+                      },
+                      {
+                        "opType": "append",
+                        "getters": {
+                          "getConcatinate": [
+                            "/",
+                            {
+                              "getStorage": "_$value_"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                "operations": [
+                  {
+                    "updateValue": {
+                      "value": {
+                        "getStorage": "path"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
