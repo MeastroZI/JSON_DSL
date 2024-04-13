@@ -14,14 +14,11 @@ const transformRule = [
                         "isKey": { "key": "$recursiveAnchor" }
                     }
                 ],
-                "operations": {
-                    "updateValue": {
-                        "value": "anchor"
-                    },
-                    "editKey": {
-                        "key": "$dynamicAnchor"
-                    }
-                }
+                "operations": [
+                    {"updateValue": {"value": "anchor"}},
+                    {"editKey": {"key": "$dynamicAnchor"}}
+                
+                ]
             },
 
             //recursiveRef ------> dynamicRef
@@ -31,14 +28,11 @@ const transformRule = [
                         "isKey": { "key": "$recursiveRef" }
                     }
                 ],
-                "operations": {
-                    "updateValue": {
-                        "value": "#anchor"
-                    },
-                    "editKey": {
-                        "key": "$dynamicRef"
-                    }
-                }
+                "operations": [
+                    {"updateValue": {"value": "#anchor"}},
+                    {"editKey": {"key": "$dynamicRef"}}
+                
+                ]
             },
 
             //items --------> prefixItems
@@ -50,11 +44,9 @@ const transformRule = [
                         }
                     }
                 ],
-                "operations": {
-                    "editKey": {
-                        "key": "prefixItems"
-                    }
-                }
+                "operations": [
+                    {"editKey": {"key": "prefixItems"}
+                }]
             },
             //additionalItems ----------------> items
             {
@@ -65,11 +57,9 @@ const transformRule = [
                         }
                     }
                 ],
-                "operations": {
-                    "editKey": {
-                        "key": "items"
-                    }
-                }
+                "operations": [
+                    {"editKey": {"key": "items"}}
+                ]
             },
             // schema uri change
             {
@@ -80,11 +70,12 @@ const transformRule = [
                         }
                     }
                 ],
-                "operations": {
+                "operations": [
+                    {
                     "updateValue": {
                         "value": "https://json-schema.org/draft/2020-12/schema"
-                    }
-                }
+                    }}
+                ]
             },
 
         ]
@@ -100,12 +91,13 @@ const transformRule = [
                     { "isKey": { key: "$ref" }, "valuePattern": ".*\\badditionalItems\\b.*" }
                 ],
 
-                operations: {
+                operations: [{
                     "valueIterator": {
                         targetValue: { getFragmentUri: null },
                         type: "string", splitBy: "/",
                         defineStorage: {
                             "path": {
+                                // getUriWithoutFragment is return the root uri (https://.....) present in the path
                                 "current": { "getConcatinate": [{ "getUriWithoutFragment": null }, "#"] },
                                 "updater": [
                                     //items ------------------------------> prefixItems 
@@ -149,12 +141,12 @@ const transformRule = [
                                 ]
                             }
                         },
-                        operations: {
+                        operations: [{
                             "updateValue": { value: { getStorage: "path" } }
-                        }
+                        }]
 
                     }
-                }
+                }]
             }
         ]
     }

@@ -12,14 +12,18 @@
             }
           }
         ],
-        "operations": {
-          "updateValue": {
-            "value": "anchor"
+        "operations": [
+          {
+            "updateValue": {
+              "value": "anchor"
+            }
           },
-          "editKey": {
-            "key": "$dynamicAnchor"
+          {
+            "editKey": {
+              "key": "$dynamicAnchor"
+            }
           }
-        }
+        ]
       },
       {
         "conditions": [
@@ -29,14 +33,18 @@
             }
           }
         ],
-        "operations": {
-          "updateValue": {
-            "value": "#anchor"
+        "operations": [
+          {
+            "updateValue": {
+              "value": "#anchor"
+            }
           },
-          "editKey": {
-            "key": "$dynamicRef"
+          {
+            "editKey": {
+              "key": "$dynamicRef"
+            }
           }
-        }
+        ]
       },
       {
         "conditions": [
@@ -46,11 +54,13 @@
             }
           }
         ],
-        "operations": {
-          "editKey": {
-            "key": "prefixItems"
+        "operations": [
+          {
+            "editKey": {
+              "key": "prefixItems"
+            }
           }
-        }
+        ]
       },
       {
         "conditions": [
@@ -60,11 +70,13 @@
             }
           }
         ],
-        "operations": {
-          "editKey": {
-            "key": "items"
+        "operations": [
+          {
+            "editKey": {
+              "key": "items"
+            }
           }
-        }
+        ]
       },
       {
         "conditions": [
@@ -74,11 +86,13 @@
             }
           }
         ],
-        "operations": {
-          "updateValue": {
-            "value": "https://json-schema.org/draft/2020-12/schema"
+        "operations": [
+          {
+            "updateValue": {
+              "value": "https://json-schema.org/draft/2020-12/schema"
+            }
           }
-        }
+        ]
       }
     ]
   },
@@ -102,107 +116,111 @@
             "valuePattern": ".*\\badditionalItems\\b.*"
           }
         ],
-        "operations": {
-          "valueIterator": {
-            "targetValue": {
-              "getFragmentUri": null
-            },
-            "type": "string",
-            "splitBy": "/",
-            "defineStorage": {
-              "path": {
-                "current": {
-                  "getConcatinate": [
+        "operations": [
+          {
+            "valueIterator": {
+              "targetValue": {
+                "getFragmentUri": null
+              },
+              "type": "string",
+              "splitBy": "/",
+              "defineStorage": {
+                "path": {
+                  "current": {
+                    "getConcatinate": [
+                      {
+                        "getUriWithoutFragment": null
+                      },
+                      "#"
+                    ]
+                  },
+                  "updater": [
                     {
-                      "getUriWithoutFragment": null
+                      "conditions": [
+                        {
+                          "isEqual": {
+                            "value1": "items",
+                            "value2": {
+                              "getStorage": "_$value_"
+                            }
+                          },
+                          "isValidPath": {
+                            "getConcatinate": [
+                              {
+                                "getStorage": "path"
+                              },
+                              "/",
+                              "prefixItems"
+                            ]
+                          }
+                        }
+                      ],
+                      "getters": {
+                        "getConcatinate": [
+                          {
+                            "getStorage": "path"
+                          },
+                          "/prefixItems"
+                        ]
+                      }
                     },
-                    "#"
+                    {
+                      "conditions": [
+                        {
+                          "isEqual": {
+                            "value1": "additionalItems",
+                            "value2": {
+                              "getStorage": "_$value_"
+                            }
+                          },
+                          "isValidPath": {
+                            "getConcatinate": [
+                              {
+                                "getStorage": "path"
+                              },
+                              "/",
+                              "items"
+                            ]
+                          }
+                        }
+                      ],
+                      "getters": {
+                        "getConcatinate": [
+                          {
+                            "getStorage": "path"
+                          },
+                          "/items"
+                        ]
+                      }
+                    },
+                    {
+                      "getters": {
+                        "getConcatinate": [
+                          {
+                            "getStorage": "path"
+                          },
+                          "/",
+                          {
+                            "getStorage": "_$value_"
+                          }
+                        ]
+                      }
+                    }
                   ]
-                },
-                "updater": [
-                  {
-                    "conditions": [
-                      {
-                        "isEqual": {
-                          "value1": "items",
-                          "value2": {
-                            "getStorage": "_$value_"
-                          }
-                        },
-                        "isValidPath": {
-                          "getConcatinate": [
-                            {
-                              "getStorage": "path"
-                            },
-                            "/",
-                            "prefixItems"
-                          ]
-                        }
-                      }
-                    ],
-                    "getters": {
-                      "getConcatinate": [
-                        {
-                          "getStorage": "path"
-                        },
-                        "/prefixItems"
-                      ]
-                    }
-                  },
-                  {
-                    "conditions": [
-                      {
-                        "isEqual": {
-                          "value1": "additionalItems",
-                          "value2": {
-                            "getStorage": "_$value_"
-                          }
-                        },
-                        "isValidPath": {
-                          "getConcatinate": [
-                            {
-                              "getStorage": "path"
-                            },
-                            "/",
-                            "items"
-                          ]
-                        }
-                      }
-                    ],
-                    "getters": {
-                      "getConcatinate": [
-                        {
-                          "getStorage": "path"
-                        },
-                        "/items"
-                      ]
-                    }
-                  },
-                  {
-                    "getters": {
-                      "getConcatinate": [
-                        {
-                          "getStorage": "path"
-                        },
-                        "/",
-                        {
-                          "getStorage": "_$value_"
-                        }
-                      ]
+                }
+              },
+              "operations": [
+                {
+                  "updateValue": {
+                    "value": {
+                      "getStorage": "path"
                     }
                   }
-                ]
-              }
-            },
-            "operations": {
-              "updateValue": {
-                "value": {
-                  "getStorage": "path"
                 }
-              }
+              ]
             }
           }
-        }
+        ]
       }
     ]
   }
