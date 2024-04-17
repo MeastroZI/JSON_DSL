@@ -1,6 +1,6 @@
 # **Json DSL**
 
-JSON_DSL is the json based DSL which provide the condition base transformation of the json data . JSON_DSL store  each of operation which is going to performed on json DATA in array when there specific conditions is get satisfied and in last all the operation is performed on the json DATA .
+JSON_DSL is the json based DSL which provide the condition base transformation of the json data . JSON_DSL store  each of operation which is going to performed on json DATA in array when there specific conditions is get satisfied and in last all the operation is performed on the json DATA. Currently, I am using recursion, which may have some side effects. However, I am confident that I can mitigate them using asynchronous programming.
 
 ## Working Explaination 
 
