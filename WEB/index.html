@@ -4,91 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Code Transform Website</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            margin: 10px;
-        }
-        .top-section {
-            display: flex;
-            flex: 1;
-            margin-bottom: 10px;
-        }
-        .code-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #ccc;
-            box-shadow: 2px 2px 12px rgba(0,0,0,0.1);
-            margin-right: 10px;
-        }
-        .code-section:last-child {
-            margin-right: 0;
-        }
-        .code-section textarea {
-            flex: 1;
-            border: none;
-            padding: 10px;
-            font-size: 16px;
-            font-family: 'Courier New', Courier, monospace;
-            resize: none;
-        }
-        .code-section button {
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .code-section button:hover {
-            background-color: #45a049;
-        }
-        .bottom-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            border-top: 1px solid #ccc;
-            box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
-        }
-        .bottom-section textarea {
-            flex: 1;
-            border: none;
-            padding: 10px;
-            font-size: 16px;
-            font-family: 'Courier New', Courier, monospace;
-            resize: none;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-    </style>
+   
 </head>
 <body>
     <div class="container">
+       
         <div class="top-section">
-            <div class="code-section">
-                <button id="TransformBtn">Transform</button>
+            <div class="code-section codeSection1">
+                <div class="Button_Container">
+                    <button id="TransformBtn" style="background-color: rgb(25, 184, 25);">Transform</button>
+                    <button id="Formate" style="background-color: rgb(4, 144, 159);">Formate</button>
+        
+                </div>
+                <h2>Json Data</h2>
                 <textarea id="codeArea1" placeholder="Write your code here..."></textarea>
             </div>
-            <div class="code-section">
+            <div class="code-section code-section-2">
+                <div >
+                    <a href="https://github.com/MeastroZI/JSON_DSL" id="anchorTag" target="_blank">Github</a>
+                </div>
+                <h2>Transformation Rule</h2>
                 <textarea id="codeArea2" placeholder="Write your code here..."></textarea>
             </div>
-        </div>
-        <div class="bottom-section">
-            <textarea id="resultArea" readonly placeholder="Transformed code will be displayed here..."></textarea>
+            
+            <div class="code-section code-section-3">
+                <h2>Result</h2>
+                <textarea id="resultArea" readonly placeholder="Transformed code will be displayed here..."></textarea>
+            </div>
         </div>
     </div>
 
-    <script src="./index.js"></script>
+    <script src="./index.js"></script> 
 </body>
 </html>
